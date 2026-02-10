@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #38f9d7;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 150px;
+            margin: 10px;
+        }
+        .stat-card h3 {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+        .stat-card p {
+            font-size: 14px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .rank {
+            font-weight: bold;
+            color: #667eea;
+        }
+        .score {
+            font-weight: bold;
+            color: #28a745;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .search-box {
+            margin-bottom: 20px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .medal {
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Results Dashboard</h1>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <h3 id="totalStudents">0</h3>
+                <p>Total Students</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="avgScore">0</h3>
+                <p>Average Score</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="highestScore">0</h3>
+                <p>Highest Score</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="lowestScore">0</h3>
+                <p>Lowest Score</p>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 20px;">
+            <button onclick="window.location.href='admin.html'">Back to Admin</button>
+            <button onclick="exportResults()">Export Results</button>
+            <button class="btn-danger" onclick="clearAllResults()">Clear All Results</button>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="searchBox" placeholder="Search by Roll Number or Name..." onkeyup="filterResults()">
+        </div>
+
+        <table id="resultsTable">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Roll Number</th>
+                    <th>Name</th>
+                    <th>Score</th>
+                    <th>Percentage</th>
+                    <th>Submitted At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="resultsBody">
+            </tbody>
+        </table>
+
+        <!-- Wrong Answers Modal -->
+        <div id="wrongAnswersModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto;">
+            <div style="max-width: 800px; margin: 50px auto; background: white; border-radius: 15px; padding: 30px; position: relative;">
+                <button onclick="closeModal()" style="position: absolute; top: 15px; right: 15px; background: #dc3545; padding: 8px 15px; width: auto;">Close</button>
+                <h2 style="color: #667eea; margin-bottom: 20px;">Wrong Answers Details</h2>
+                <div id="modalContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allResults = [];
+
+        function loadResults() {
+            const saved = localStorage.getItem('testResults');
+            if (saved) {
+                allResults = JSON.parse(saved);
+                allResults.sort((a, b) => b.score - a.score);
+            }
+            displayResults(allResults);
+            updateStats();
+        }
+
+        function displayResults(results) {
+            const tbody = document.getElementById('resultsBody');
+            tbody.innerHTML = '';
+
+            if (results.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No results found</td></tr>';
+                return;
+            }
+
+            results.forEach((result, index) => {
+                const percentage = ((result.score / result.totalMarks) * 100).toFixed(2);
+                const date = new Date(result.submittedAt).toLocaleString('hi-IN');
+                
+                let medal = '';
+                if (index === 0) medal = '🥇';
+                else if (index === 1) medal = '🥈';
+                else if (index === 2) medal = '🥉';
+
+                const wrongCount = result.wrongAnswers ? result.wrongAnswers.length : 0;
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="rank">${medal} ${index + 1}</td>
+                    <td>${result.rollNumber}</td>
+                    <td>${result.name}</td>
+                    <td class="score">${result.score}/${result.totalMarks}</td>
+                    <td>${percentage}%</td>
+                    <td>${date}</td>
+                    <td>
+                        <button onclick="showWrongAnswers(${index})" style="background: #dc3545; padding: 8px 15px; font-size: 14px; width: auto;">
+                            ❌ Wrong (${wrongCount})
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateStats() {
+            const total = allResults.length;
+            document.getElementById('totalStudents').textContent = total;
+
+            if (total > 0) {
+                const scores = allResults.map(r => r.score);
+                const avg = (scores.reduce((a, b) => a + b, 0) / total).toFixed(2);
+                const highest = Math.max(...scores);
+                const lowest = Math.min(...scores);
+
+                document.getElementById('avgScore').textContent = avg;
+                document.getElementById('highestScore').textContent = highest;
+                document.getElementById('lowestScore').textContent = lowest;
+            }
+        }
+
+        function filterResults() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            const filtered = allResults.filter(r => 
+                r.rollNumber.toLowerCase().includes(searchTerm) || 
+                r.name.toLowerCase().includes(searchTerm)
+            );
+            displayResults(filtered);
+        }
+
+        function exportResults() {
+            if (allResults.length === 0) {
+                alert('No results to export!');
+                return;
+            }
+
+            let csv = 'Rank,Roll Number,Name,Score,Total Marks,Percentage,Submitted At,Wrong Questions\n';
+            allResults.forEach((result, index) => {
+                const percentage = ((result.score / result.totalMarks) * 100).toFixed(2);
+                const date = new Date(result.submittedAt).toLocaleString('hi-IN');
+                const wrongQuestions = result.wrongAnswers ? result.wrongAnswers.map(w => `Q${w.questionNumber}`).join('; ') : 'None';
+                csv += `${index + 1},${result.rollNumber},${result.name},${result.score},${result.totalMarks},${percentage}%,${date},"${wrongQuestions}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'test_results.csv';
+            a.click();
+        }
+
+        function showWrongAnswers(index) {
+            const result = allResults[index];
+            const modal = document.getElementById('wrongAnswersModal');
+            const content = document.getElementById('modalContent');
+
+            if (!result.wrongAnswers || result.wrongAnswers.length === 0) {
+                content.innerHTML = '<p style="text-align: center; color: #28a745; font-size: 18px;">🎉 Perfect Score! No wrong answers!</p>';
+            } else {
+                let html = `
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <strong>Student:</strong> ${result.name} (${result.rollNumber})<br>
+                        <strong>Score:</strong> ${result.score}/${result.totalMarks}<br>
+                        <strong>Wrong Answers:</strong> ${result.wrongAnswers.length}
+                    </div>
+                `;
+
+                result.wrongAnswers.forEach((wrong, i) => {
+                    html += `
+                        <div style="background: #fff3cd; padding: 15px; margin-bottom: 15px; border-radius: 8px; border-left: 4px solid #dc3545;">
+                            <strong style="color: #dc3545;">Q${wrong.questionNumber}:</strong> ${wrong.question}<br>
+                            <div style="margin-top: 10px;">
+                                <span style="color: #dc3545;">❌ Student Answer: ${wrong.studentAnswer}</span><br>
+                                <span style="color: #28a745;">✓ Correct Answer: ${wrong.correctAnswer}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                content.innerHTML = html;
+            }
+
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('wrongAnswersModal').style.display = 'none';
+        }
+
+        function clearAllResults() {
+            if (confirm('Are you sure you want to clear all results? This cannot be undone!')) {
+                localStorage.removeItem('testResults');
+                allResults = [];
+                displayResults(allResults);
+                updateStats();
+                alert('All results cleared!');
+            }
+        }
+
+        loadResults();
+    </script>
+</body>
+</html>

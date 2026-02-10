@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Result</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #fa709a;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .result-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .result-row:last-child {
+            border-bottom: none;
+        }
+        .label {
+            font-weight: 600;
+            color: #333;
+        }
+        .value {
+            color: #666;
+        }
+        .score-big {
+            text-align: center;
+            font-size: 48px;
+            font-weight: bold;
+            color: #28a745;
+            margin: 30px 0;
+        }
+        .percentage {
+            text-align: center;
+            font-size: 24px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #fa709a;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+        button:hover {
+            background: #e85d89;
+        }
+        .rank-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 My Test Result</h1>
+        
+        <div class="result-card">
+            <div class="result-row">
+                <span class="label">Roll Number:</span>
+                <span class="value" id="rollNumber"></span>
+            </div>
+            <div class="result-row">
+                <span class="label">Name:</span>
+                <span class="value" id="studentName"></span>
+            </div>
+            <div class="result-row">
+                <span class="label">Rank:</span>
+                <span class="value"><span class="rank-badge" id="rank"></span></span>
+            </div>
+        </div>
+
+        <div class="score-big" id="score"></div>
+        <div class="percentage" id="percentage"></div>
+
+        <div class="result-card">
+            <div class="result-row">
+                <span class="label">Total Questions:</span>
+                <span class="value" id="totalQuestions"></span>
+            </div>
+            <div class="result-row">
+                <span class="label">Correct Answers:</span>
+                <span class="value" id="correctAnswers"></span>
+            </div>
+            <div class="result-row">
+                <span class="label">Wrong Answers:</span>
+                <span class="value" id="wrongAnswers"></span>
+            </div>
+            <div class="result-row">
+                <span class="label">Submitted At:</span>
+                <span class="value" id="submittedAt"></span>
+            </div>
+        </div>
+
+        <button onclick="window.location.href='index.html'">Back to Home</button>
+    </div>
+
+    <script>
+        function loadResult() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const rollNumber = urlParams.get('roll');
+
+            if (!rollNumber) {
+                alert('Invalid access!');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const results = JSON.parse(localStorage.getItem('testResults') || '[]');
+            const studentResult = results.find(r => r.rollNumber === rollNumber);
+
+            if (!studentResult) {
+                alert('Result not found!');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Sort to get rank
+            results.sort((a, b) => b.score - a.score);
+            const rank = results.findIndex(r => r.rollNumber === rollNumber) + 1;
+
+            // Display result
+            document.getElementById('rollNumber').textContent = studentResult.rollNumber;
+            document.getElementById('studentName').textContent = studentResult.name;
+            document.getElementById('rank').textContent = `#${rank}`;
+            document.getElementById('score').textContent = `${studentResult.score}/${studentResult.totalMarks}`;
+            
+            const percentage = ((studentResult.score / studentResult.totalMarks) * 100).toFixed(2);
+            document.getElementById('percentage').textContent = `${percentage}%`;
+
+            const totalQuestions = studentResult.totalMarks / 2;
+            const correctAnswers = studentResult.score / 2;
+            const wrongAnswers = totalQuestions - correctAnswers;
+
+            document.getElementById('totalQuestions').textContent = totalQuestions;
+            document.getElementById('correctAnswers').textContent = correctAnswers;
+            document.getElementById('wrongAnswers').textContent = wrongAnswers;
+            document.getElementById('submittedAt').textContent = new Date(studentResult.submittedAt).toLocaleString('hi-IN');
+        }
+
+        loadResult();
+    </script>
+</body>
+</html>

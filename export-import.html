@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backup & Restore Questions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 5px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #0c5460;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        input[type="file"] {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💾 Backup & Restore System</h1>
+
+        <div class="info">
+            <strong>⚠️ Important:</strong> Agar questions save nahi ho rahe, toh yahan se backup/restore karo!
+        </div>
+
+        <!-- Export Section -->
+        <div class="section">
+            <h2>📤 Export Questions (Backup)</h2>
+            <p>Apne sabhi questions ko file mein save karo</p>
+            <button class="btn-success" onclick="exportQuestions()">Download Questions File</button>
+            <button onclick="copyToClipboard()">Copy to Clipboard</button>
+        </div>
+
+        <!-- Import Section -->
+        <div class="section">
+            <h2>📥 Import Questions (Restore)</h2>
+            <p>Pehle save ki hui file se questions load karo</p>
+            <input type="file" id="fileInput" accept=".json" onchange="importFromFile()">
+            <button class="btn-success" onclick="document.getElementById('fileInput').click()">Choose File</button>
+            
+            <p style="margin-top: 20px;"><strong>Ya phir paste karo:</strong></p>
+            <textarea id="importText" placeholder="Questions JSON yahan paste karo..."></textarea>
+            <button class="btn-success" onclick="importFromText()">Import Questions</button>
+        </div>
+
+        <!-- Manual Backup Section -->
+        <div class="section">
+            <h2>📋 Manual Backup</h2>
+            <p>Current questions ka backup dekho:</p>
+            <textarea id="backupText" readonly></textarea>
+            <button onclick="refreshBackup()">Refresh Backup</button>
+        </div>
+
+        <!-- Actions -->
+        <div class="section">
+            <h2>🔧 Actions</h2>
+            <button onclick="window.location.href='admin.html'">Back to Admin</button>
+            <button class="btn-danger" onclick="clearAllQuestions()">Clear All Questions</button>
+        </div>
+
+        <div class="info">
+            <strong>💡 Tip:</strong> Questions add karne ke baad yahan se backup zaroor lo!
+        </div>
+    </div>
+
+    <script>
+        function exportQuestions() {
+            const questions = localStorage.getItem('testQuestions');
+            if (!questions || questions === '[]') {
+                alert('Koi questions nahi hain export karne ke liye!');
+                return;
+            }
+
+            const blob = new Blob([questions], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'test-questions-backup.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            alert('Questions file download ho gayi!');
+        }
+
+        function copyToClipboard() {
+            const questions = localStorage.getItem('testQuestions');
+            if (!questions || questions === '[]') {
+                alert('Koi questions nahi hain!');
+                return;
+            }
+
+            navigator.clipboard.writeText(questions).then(() => {
+                alert('Questions clipboard mein copy ho gaye! Kahi safe jagah paste kar do.');
+            }).catch(err => {
+                alert('Copy nahi hua: ' + err);
+            });
+        }
+
+        function importFromFile() {
+            const file = document.getElementById('fileInput').files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    localStorage.setItem('testQuestions', JSON.stringify(data));
+                    alert('Questions successfully import ho gaye! Total: ' + data.length);
+                    refreshBackup();
+                } catch (err) {
+                    alert('Invalid file! Error: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function importFromText() {
+            const text = document.getElementById('importText').value.trim();
+            if (!text) {
+                alert('Pehle questions paste karo!');
+                return;
+            }
+
+            try {
+                const data = JSON.parse(text);
+                localStorage.setItem('testQuestions', JSON.stringify(data));
+                alert('Questions successfully import ho gaye! Total: ' + data.length);
+                document.getElementById('importText').value = '';
+                refreshBackup();
+            } catch (err) {
+                alert('Invalid JSON! Error: ' + err.message);
+            }
+        }
+
+        function refreshBackup() {
+            const questions = localStorage.getItem('testQuestions') || '[]';
+            document.getElementById('backupText').value = questions;
+        }
+
+        function clearAllQuestions() {
+            if (confirm('Kya aap sure hain? Sabhi questions delete ho jayenge!')) {
+                localStorage.removeItem('testQuestions');
+                alert('Sabhi questions delete ho gaye!');
+                refreshBackup();
+            }
+        }
+
+        // Load backup on page load
+        refreshBackup();
+    </script>
+</body>
+</html>

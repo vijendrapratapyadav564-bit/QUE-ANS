@@ -1,0 +1,77 @@
+📚 Sample Questions - Admin Panel Mein Add Karne Ke Liye
+
+Question 1:
+Question: भारत की राजधानी क्या है?
+Option 1: मुंबई
+Option 2: दिल्ली
+Option 3: कोलकाता
+Option 4: चेन्नई
+Correct Answer: 1
+
+---
+
+Question 2:
+Question: 2 + 2 = ?
+Option 1: 3
+Option 2: 4
+Option 3: 5
+Option 4: 6
+Correct Answer: 1
+
+---
+
+Question 3:
+Question: सूर्य किस दिशा में उगता है?
+Option 1: पश्चिम
+Option 2: उत्तर
+Option 3: पूर्व
+Option 4: दक्षिण
+Correct Answer: 2
+
+---
+
+Question 4:
+Question: भारत का राष्ट्रीय पक्षी कौन सा है?
+Option 1: कबूतर
+Option 2: तोता
+Option 3: मोर
+Option 4: कौआ
+Correct Answer: 2
+
+---
+
+Question 5:
+Question: एक साल में कितने महीने होते हैं?
+Option 1: 10
+Option 2: 11
+Option 3: 12
+Option 4: 13
+Correct Answer: 2
+
+---
+
+📌 IMPORTANT:
+- Correct Answer mein number dalo (0, 1, 2, ya 3)
+- 0 = First Option
+- 1 = Second Option
+- 2 = Third Option
+- 3 = Fourth Option
+
+---
+
+🎯 Kaise Use Karein:
+
+1. admin.html open karo browser mein
+2. Upar diye gaye questions ko ek-ek karke copy karo
+3. Form mein paste karo
+4. "Add Question" button click karo
+5. 50 questions tak add kar sakte ho
+
+---
+
+💡 Tips:
+
+- Har question 2 marks ka hai
+- Total 50 questions = 100 marks
+- Questions add karne ke baad "View Dashboard" se check kar sakte ho
+- Questions delete bhi kar sakte ho agar galti ho jaye
