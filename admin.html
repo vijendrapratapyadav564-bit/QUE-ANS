@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - Add Questions</title>
+    <script src="cloud-storage.js"></script>
     <style>
         * {
             margin: 0;
@@ -176,6 +177,7 @@
         <button onclick="addQuestion()">Add Question</button>
         <button class="btn-secondary" onclick="clearForm()">Clear Form</button>
         <button class="btn-secondary" onclick="viewDashboard()">View Dashboard</button>
+        <button class="btn-secondary" onclick="window.location.href='sync.html'">☁️ Cloud Sync</button>
         <button class="btn-secondary" onclick="window.location.href='export-import.html'">💾 Backup/Restore</button>
 
         <!-- Wrong Answers Section -->
@@ -197,12 +199,9 @@
         let questions = [];
         let allStudentResults = [];
 
-        // Load existing questions
-        function loadQuestions() {
-            const saved = localStorage.getItem('testQuestions');
-            if (saved) {
-                questions = JSON.parse(saved);
-            }
+        // Load existing questions from cloud
+        async function loadQuestions() {
+            questions = await cloudStorage.loadQuestions();
             displayQuestions();
             updateStats();
             loadWrongAnswers();
@@ -376,7 +375,9 @@
         }
 
         // Load questions on page load
-        loadQuestions();
+        window.addEventListener('load', () => {
+            loadQuestions();
+        });
     </script>
 </body>
 </html>

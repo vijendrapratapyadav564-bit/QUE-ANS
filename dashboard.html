@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Results Dashboard</title>
+    <script src="cloud-storage.js"></script>
     <style>
         * {
             margin: 0;
@@ -174,12 +175,9 @@
     <script>
         let allResults = [];
 
-        function loadResults() {
-            const saved = localStorage.getItem('testResults');
-            if (saved) {
-                allResults = JSON.parse(saved);
-                allResults.sort((a, b) => b.score - a.score);
-            }
+        async function loadResults() {
+            allResults = await cloudStorage.loadResults();
+            allResults.sort((a, b) => b.score - a.score);
             displayResults(allResults);
             updateStats();
         }
@@ -317,7 +315,9 @@
             }
         }
 
-        loadResults();
+        window.addEventListener('load', () => {
+            loadResults();
+        });
     </script>
 </body>
 </html>

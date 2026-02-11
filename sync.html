@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Sync - Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 5px;
+            width: calc(100% - 10px);
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .info-box {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ffc107;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-item h3 {
+            font-size: 32px;
+            color: #667eea;
+        }
+        .stat-item p {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>☁️ Cloud Sync - Admin Panel</h1>
+        
+        <div class="info-box">
+            <strong>📌 How it works:</strong><br>
+            1. Questions aur results GitHub repository mein store hote hain<br>
+            2. Kisi bhi device se access kar sakte ho<br>
+            3. "Upload to Cloud" button se data GitHub par save hoga<br>
+            4. "Download from Cloud" button se latest data milega
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <h3 id="localQuestions">0</h3>
+                <p>Local Questions</p>
+            </div>
+            <div class="stat-item">
+                <h3 id="localResults">0</h3>
+                <p>Local Results</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📥 Download from Cloud</h2>
+            <p style="color: #666; margin-bottom: 15px;">Latest questions aur results GitHub se download karo</p>
+            <button onclick="downloadFromCloud()">Download Latest Data</button>
+        </div>
+
+        <div class="section">
+            <h2>📤 Upload to Cloud</h2>
+            <p style="color: #666; margin-bottom: 15px;">Local questions aur results ko GitHub par upload karo</p>
+            <button class="btn-success" onclick="uploadToCloud()">Upload to GitHub</button>
+            <p style="color: #999; font-size: 12px; margin-top: 10px;">
+                Note: Yeh files download hongi. Unhe manually GitHub repository mein upload karna hoga.
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>🔄 Quick Actions</h2>
+            <button onclick="window.location.href='admin.html'">Go to Admin Panel</button>
+            <button onclick="window.location.href='dashboard.html'">Go to Dashboard</button>
+            <button onclick="window.location.href='links.html'">All Links</button>
+        </div>
+
+        <div id="status" class="status"></div>
+    </div>
+
+    <script src="cloud-storage.js"></script>
+    <script>
+        function showStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 5000);
+        }
+
+        async function downloadFromCloud() {
+            showStatus('Downloading from cloud...', 'info');
+            
+            try {
+                const questions = await cloudStorage.loadQuestions();
+                const results = await cloudStorage.loadResults();
+                
+                updateStats();
+                showStatus(`✅ Downloaded! Questions: ${questions.length}, Results: ${results.length}`, 'success');
+            } catch (error) {
+                showStatus('❌ Download failed: ' + error.message, 'error');
+            }
+        }
+
+        function uploadToCloud() {
+            const questions = JSON.parse(localStorage.getItem('testQuestions') || '[]');
+            const results = JSON.parse(localStorage.getItem('testResults') || '[]');
+            
+            if (questions.length === 0 && results.length === 0) {
+                showStatus('❌ No data to upload!', 'error');
+                return;
+            }
+
+            // Download files for manual GitHub upload
+            if (questions.length > 0) {
+                cloudStorage.exportForGitHub(questions, 'questions.json');
+            }
+            if (results.length > 0) {
+                cloudStorage.exportForGitHub(results, 'results.json');
+            }
+
+            showStatus(`✅ Files downloaded! Upload them to GitHub:\n1. Go to: github.com/vijendrapratapyadav564-bit/QUE-ANS\n2. Navigate to 'data' folder\n3. Upload the downloaded files`, 'success');
+        }
+
+        function updateStats() {
+            const questions = JSON.parse(localStorage.getItem('testQuestions') || '[]');
+            const results = JSON.parse(localStorage.getItem('testResults') || '[]');
+            
+            document.getElementById('localQuestions').textContent = questions.length;
+            document.getElementById('localResults').textContent = results.length;
+        }
+
+        // Load stats on page load
+        updateStats();
+
+        // Auto-download from cloud on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                downloadFromCloud();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

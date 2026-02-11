@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live MCQ Test - Student Portal</title>
+    <script src="cloud-storage.js"></script>
     <style>
         * {
             margin: 0;
@@ -176,17 +177,17 @@
         let timeLeft = 1200; // 20 minutes in seconds
         let timerInterval;
 
-        // Load questions from localStorage
-        function loadQuestions() {
-            const savedQuestions = localStorage.getItem('testQuestions');
-            if (savedQuestions) {
-                questions = JSON.parse(savedQuestions);
-            } else {
+        // Load questions from cloud or localStorage
+        async function loadQuestions() {
+            // Try loading from cloud first
+            questions = await cloudStorage.loadQuestions();
+            
+            if (questions.length === 0) {
                 alert('No questions found! Please contact admin.');
             }
         }
 
-        function startTest() {
+        async function startTest() {
             const rollNumber = document.getElementById('rollNumber').value.trim();
             const studentName = document.getElementById('studentName').value.trim();
 
@@ -201,7 +202,7 @@
                 startTime: new Date().toISOString()
             };
 
-            loadQuestions();
+            await loadQuestions();
 
             if (questions.length === 0) {
                 alert('No questions available!');
