@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Links - MCQ Test System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 32px;
+        }
+        h2 {
+            color: #333;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        .link-card {
+            background: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        .link-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        .link-card p {
+            color: #666;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .link-card a {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        .link-card a:hover {
+            background: #5568d3;
+        }
+        .admin-section {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .student-section {
+            background: #d1ecf1;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .warning {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 MCQ Test System - All Links</h1>
+        
+        <div class="warning">
+            <strong>⚠️ Important:</strong> Admin links ko private rakho! Sirf student links share karo.
+        </div>
+
+        <div class="admin-section">
+            <h2>👨‍💼 Admin Links (Private - Sirf Aapke Liye)</h2>
+            
+            <div class="link-card">
+                <h3>1. Admin Panel - Questions Add Karo</h3>
+                <p>Yahan se questions add, edit, delete karo</p>
+                <a href="admin.html" target="_blank">Open Admin Panel</a>
+            </div>
+
+            <div class="link-card">
+                <h3>2. Dashboard - All Results</h3>
+                <p>Sabhi students ke results, rankings, statistics dekho</p>
+                <a href="dashboard.html" target="_blank">Open Dashboard</a>
+            </div>
+
+            <div class="link-card">
+                <h3>3. Backup/Restore</h3>
+                <p>Questions aur results ka backup lo ya restore karo</p>
+                <a href="export-import.html" target="_blank">Open Backup/Restore</a>
+            </div>
+        </div>
+
+        <div class="student-section">
+            <h2>👨‍🎓 Student Links (Public - Students Ko Share Karo)</h2>
+            
+            <div class="link-card">
+                <h3>1. Test Portal - Test Dene Ke Liye</h3>
+                <p>Students yahan se test denge (20 minute timer)</p>
+                <a href="index.html" target="_blank">Open Test Portal</a>
+            </div>
+
+            <div class="link-card">
+                <h3>2. Result Check - Result Dekhne Ke Liye</h3>
+                <p>Students apna result, rank, score dekh sakte hain</p>
+                <a href="student-result.html" target="_blank">Open Result Page</a>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; padding: 20px; background: #e7f3ff; border-radius: 10px;">
+            <h3 style="color: #004085; margin-bottom: 10px;">📋 Quick Instructions:</h3>
+            <ol style="color: #004085; line-height: 1.8; padding-left: 20px;">
+                <li>Pehle <strong>Admin Panel</strong> se questions add karo</li>
+                <li>Test Portal check karo ki questions dikh rahe hain</li>
+                <li>Khud ek test do (testing ke liye)</li>
+                <li>Dashboard se results check karo</li>
+                <li>Sab theek hai to students ko <strong>Test Portal</strong> link share karo</li>
+            </ol>
+        </div>
+
+        <div style="margin-top: 20px; text-align: center; color: #666; font-size: 14px;">
+            <p>🌐 Live Site: https://vijendrapratapyadav564-bit.github.io/QUE-ANS/</p>
+        </div>
+    </div>
+</body>
+</html>
