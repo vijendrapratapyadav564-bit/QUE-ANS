@@ -121,13 +121,15 @@
                 <span class="value" id="correctAnswers"></span>
             </div>
             <div class="result-row">
-                <span class="label">Wrong Answers:</span>
-                <span class="value" id="wrongAnswers"></span>
-            </div>
-            <div class="result-row">
                 <span class="label">Submitted At:</span>
                 <span class="value" id="submittedAt"></span>
             </div>
+        </div>
+        
+        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; text-align: center; margin-top: 20px;">
+            <p style="color: #856404; margin: 0;">
+                ℹ️ Detailed answers are not shown to students
+            </p>
         </div>
 
         <button onclick="window.location.href='index.html'">Back to Home</button>
@@ -168,11 +170,9 @@
 
             const totalQuestions = studentResult.totalMarks / 2;
             const correctAnswers = studentResult.score / 2;
-            const wrongAnswers = totalQuestions - correctAnswers;
 
             document.getElementById('totalQuestions').textContent = totalQuestions;
             document.getElementById('correctAnswers').textContent = correctAnswers;
-            document.getElementById('wrongAnswers').textContent = wrongAnswers;
             document.getElementById('submittedAt').textContent = new Date(studentResult.submittedAt).toLocaleString('hi-IN');
         }
 
